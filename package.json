@@ -1,0 +1,50 @@
+{
+  "name": "animalcare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server/src/index.js",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "node server/src/index.js",
+    "migrate": "node server/scripts/run-migration.js",
+    "seed": "node server/scripts/seed-data.js",
+    "test": "node --check server/src/index.js"
+  },
+  "keywords": [
+    "animalcare",
+    "aws",
+    "postgresql",
+    "express",
+    "react",
+    "vite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "AnimalCare full-stack application for managing animal records with AWS integrations.",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "helmet": "^8.3.0",
+    "morgan": "^1.12.1",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "uuid": "^14.0.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.6.1",
+    "concurrently": "^9.2.0",
+    "eslint": "^8.57.1",
+    "nodemon": "^3.1.14",
+    "postcss": "^8.5.31",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.10"
+  }
+}
