@@ -114,6 +114,30 @@ This project is intended to run on an Amazon Linux 2023 EC2 instance and use:
 - Keep bucket private by default
 - Use presigned URLs for private image access
 
+#### EC2 permissions for S3 uploads
+
+The application uses the AWS SDK default credential provider chain. On EC2, attach an IAM
+instance profile (IAM role) to the instance; do not place long-lived access keys in `.env`.
+Grant the role access only to the image objects in the bucket. Replace
+`YOUR_BUCKET_NAME` in this policy before attaching it to the role:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/animals/*"
+    }
+  ]
+}
+```
+
+Set `AWS_REGION` to the bucket's AWS Region and `S3_BUCKET` to its exact name in the
+application `.env`. Bucket CORS and public access are not required for uploads because
+the browser sends the image to the API and the API sends it to S3.
+
 ### 2. Prepare the EC2 instance
 
 SSH into the EC2 instance:
@@ -172,15 +196,14 @@ DB_USER=animalcare_admin
 DB_PASSWORD=<DATABASE_PASSWORD>
 DB_SSL=true
 AWS_REGION=ap-southeast-1
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
 S3_BUCKET=<YOUR_S3_BUCKET_NAME>
 ```
 
 Important:
 
 - Do not commit the real `.env` file to GitHub.
-- Prefer IAM roles on EC2 over hardcoded AWS credentials when possible.
+- Attach an EC2 IAM role with the S3 object permissions above. The AWS SDK will use it automatically.
+- For local development, configure the AWS CLI profile or environment credentials outside source control.
 - Use AWS Secrets Manager if you want a more secure production setup.
 
 ### 5. Run database migration and seed data

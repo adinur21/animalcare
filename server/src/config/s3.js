@@ -6,21 +6,21 @@ import { randomUUID } from 'crypto';
 dotenv.config();
 
 export function createS3Client() {
-  if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-    return null;
-  }
-
   return new S3Client({
-    region: process.env.AWS_REGION || 'us-east-1',
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    }
+    region: process.env.AWS_REGION || 'us-east-1'
   });
 }
 
 export const s3Client = createS3Client();
-export const S3_BUCKET = process.env.S3_BUCKET || 'animalcare-assets';
+export const S3_BUCKET = process.env.S3_BUCKET;
+
+function requireBucket() {
+  if (!S3_BUCKET) {
+    throw new Error('S3_BUCKET is not configured.');
+  }
+
+  return S3_BUCKET;
+}
 
 export function buildObjectKey(fileName) {
   const extension = fileName.includes('.') ? fileName.split('.').pop() : 'jpg';
@@ -28,13 +28,9 @@ export function buildObjectKey(fileName) {
 }
 
 export async function uploadToS3(buffer, fileName, contentType) {
-  if (!s3Client) {
-    return { key: fileName, url: null };
-  }
-
   const key = buildObjectKey(fileName);
   await s3Client.send(new PutObjectCommand({
-    Bucket: S3_BUCKET,
+    Bucket: requireBucket(),
     Key: key,
     Body: buffer,
     ContentType: contentType,
@@ -42,25 +38,25 @@ export async function uploadToS3(buffer, fileName, contentType) {
   }));
 
   return { key, url: await getSignedUrl(s3Client, new GetObjectCommand({
-    Bucket: S3_BUCKET,
+    Bucket: requireBucket(),
     Key: key
   }), { expiresIn: 3600 }) };
 }
 
 export async function deleteFromS3(key) {
-  if (!key || !s3Client) return;
+  if (!key) return;
 
   await s3Client.send(new DeleteObjectCommand({
-    Bucket: S3_BUCKET,
+    Bucket: requireBucket(),
     Key: key
   }));
 }
 
 export async function getPresignedReadUrl(key, expiresIn = 3600) {
-  if (!key || !s3Client) return null;
+  if (!key) return null;
 
   return getSignedUrl(s3Client, new GetObjectCommand({
-    Bucket: S3_BUCKET,
+    Bucket: requireBucket(),
     Key: key
   }), { expiresIn });
 }
