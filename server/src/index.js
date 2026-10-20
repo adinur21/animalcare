@@ -20,6 +20,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      'upgrade-insecure-requests': null
+    }
+  },
   crossOriginResourcePolicy: false
 }));
 app.use(cors({ origin: true, credentials: true }));
