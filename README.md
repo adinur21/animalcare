@@ -1,7 +1,7 @@
 # AnimalCare
 
 AnimalCare is a full-stack animal management application built with Node.js, Express, PostgreSQL, React, and Vite. It includes animal CRUD operations, dashboard analytics, and AWS-ready storage integrations for S3 uploads.
-
+This app use for UUK exam.
 ## Stack
 
 - Runtime: Node.js LTS
