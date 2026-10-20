@@ -48,7 +48,14 @@ This app is intended for deployment on AWS and can be used as a project submissi
    npm run dev
    ```
 
-The backend runs at `http://localhost:5000`, and the Vite frontend runs on its default development port.
+6. For production mode, build the frontend first:
+
+   ```bash
+   npm run build
+   npm start
+   ```
+
+The backend runs at `http://localhost:5000`, and the Vite frontend runs on its default development port. In production, the Express server serves the built React app from `client/dist`, so `npm run build` must be run before launching the backend on AWS or on a production-like environment.
 
 ## Available scripts
 
@@ -139,8 +146,10 @@ git clone <YOUR_GITHUB_REPO_URL> animalcare
 cd animalcare
 npm install
 npm --prefix client install
-npm --prefix client run build
+npm run build
 ```
+
+Important: the backend serves the frontend from `client/dist`, so the production build must exist before starting the app in production. If the build is missing, the root page can appear blank or return a 503 message.
 
 ### 4. Configure environment variables
 

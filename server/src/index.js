@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -51,14 +52,30 @@ app.use('/api/animals', animalRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 const staticDistPath = path.resolve(__dirname, '../../client/dist');
-app.use(express.static(staticDistPath));
-app.get(/^(?!\/api).*/, (req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    return next();
-  }
+const staticIndexPath = path.join(staticDistPath, 'index.html');
+const frontendBuildExists = fs.existsSync(staticDistPath) && fs.existsSync(staticIndexPath);
 
-  res.sendFile(path.join(staticDistPath, 'index.html'));
-});
+if (frontendBuildExists) {
+  app.use(express.static(staticDistPath));
+  app.get(/^(?!\/api).*/, (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+
+    res.sendFile(staticIndexPath);
+  });
+} else {
+  console.warn('Frontend build not found at client/dist. Run "npm run build" before running the app in production.');
+  app.get(/^(?!\/api).*/, (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ message: 'API route not found.' });
+    }
+
+    res.status(503).json({
+      message: 'Frontend production build not found. Run "npm run build" in the project root and restart the app.'
+    });
+  });
+}
 
 app.use(notFoundHandler);
 app.use(errorHandler);
