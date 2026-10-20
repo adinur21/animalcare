@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Database, FileText, Filter, Home, Plus, Search, Settings, ShieldCheck, Trash2, Upload, UserCircle2 } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 const CATEGORIES = ['Mamalia', 'Reptil', 'Aves', 'Pisces', 'Amfibi', 'Lainnya'];
 const GENDERS = ['Jantan', 'Betina', 'Tidak Diketahui'];
 
