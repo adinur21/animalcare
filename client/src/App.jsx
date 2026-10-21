@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BarChart3, Database, FileText, Filter, Home, Plus, Search, Settings, ShieldCheck, Trash2, Upload, UserCircle2 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
@@ -69,6 +69,8 @@ function App() {
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState({ totalPages: 1, total: 0, page: 1 });
   const [form, setForm] = useState(defaultForm);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const imageInputRef = useRef(null);
   const [editingId, setEditingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -134,6 +136,10 @@ function App() {
 
   const resetForm = () => {
     setForm(defaultForm);
+    setSelectedImage(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
     setEditingId(null);
   };
 
@@ -155,6 +161,9 @@ function App() {
           body.append(key, value);
         }
       });
+      if (selectedImage) {
+        body.append('image', selectedImage);
+      }
 
       const endpoint = editingId ? `/animals/${editingId}` : '/animals';
       const method = editingId ? 'PUT' : 'POST';
@@ -179,6 +188,10 @@ function App() {
   };
 
   const handleEdit = (animal) => {
+    setSelectedImage(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
     setEditingId(animal.id);
     setForm({
       name: animal.name || '',
@@ -458,8 +471,14 @@ function App() {
 
                 <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-[#FFD400] bg-[#FFD400]/5 px-3 py-4 text-sm text-[#FFD400]">
                   <Upload className="h-4 w-4" />
-                  Unggah Gambar
-                  <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => setForm({ ...form, image_key: e.target.files?.[0]?.name || '' })} />
+                  {selectedImage?.name || (form.image_key ? 'Gambar tersimpan - pilih untuk mengganti' : 'Unggah Gambar')}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={(e) => setSelectedImage(e.target.files?.[0] || null)}
+                  />
                 </label>
 
                 {error && <p className="rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
