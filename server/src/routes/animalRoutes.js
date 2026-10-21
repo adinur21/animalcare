@@ -37,17 +37,17 @@ const handleUploadError = (err, req, res, next) => {
 
 const animalSchema = z.object({
   name: z.string().trim().min(1).max(150),
-  scientific_name: z.string().trim().max(200).optional().or(z.literal('')),
+  scientific_name: z.string().trim().max(200).nullable().optional(),
   category: z.enum(['Mamalia', 'Reptil', 'Aves', 'Pisces', 'Amfibi', 'Lainnya']),
-  habitat: z.string().trim().max(150).optional().or(z.literal('')),
-  diet: z.string().trim().max(100).optional().or(z.literal('')),
+  habitat: z.string().trim().max(150).nullable().optional(),
+  diet: z.string().trim().max(100).nullable().optional(),
   gender: z.enum(['Jantan', 'Betina', 'Tidak Diketahui']).optional(),
   age_years: z.coerce.number().min(0).max(200).optional().or(z.literal('')),
   weight_kg: z.coerce.number().min(0).max(10000).optional().or(z.literal('')),
-  origin: z.string().trim().max(200).optional().or(z.literal('')),
-  conservation_status: z.string().trim().max(100).optional().or(z.literal('')),
-  description: z.string().trim().max(5000).optional().or(z.literal('')),
-  image_key: z.string().trim().max(500).optional().or(z.literal(''))
+  origin: z.string().trim().max(200).nullable().optional(),
+  conservation_status: z.string().trim().max(100).nullable().optional(),
+  description: z.string().trim().max(5000).nullable().optional(),
+  image_key: z.string().trim().max(500).nullable().optional()
 });
 
 function normalizePayload(payload) {

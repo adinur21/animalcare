@@ -174,7 +174,10 @@ function App() {
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.message || 'Operasi gagal');
+        const details = Array.isArray(data.details)
+          ? data.details.map((issue) => `${issue.path?.join('.') || 'data'}: ${issue.message}`).join('; ')
+          : data.details;
+        throw new Error([data.message || 'Operasi gagal', details].filter(Boolean).join(': '));
       }
 
       resetForm();
